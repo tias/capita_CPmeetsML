@@ -1,0 +1,13 @@
+Capita Selecta AI at KU Leuven
+==============================
+
+This is the assignment for the 4th module of the capita course.
+
+The description of part A is in the file capita_CPmeetsML_partA.pdf
+
+
+If you want to propose additions to the course description (e.g. pitfalls in setting up the MiniZinc IDE or usage of the scripts) or propose changes to the scripts (to make it more compatible with different platforms or to add extra command-line parameters or visualisations or whatnot), I welcome you to create a pull request.
+
+Be careful that your pull requests do not contain parts of your solution. It should only contain general purpose improvements to existing files. For questions regarding the content of the assignment or other problems, use the official discussion board on Toledo. In case of doubt, mail me: tias.guns@cs.kuleuven.be
+
+

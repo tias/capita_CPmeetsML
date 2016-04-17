@@ -127,6 +127,7 @@ if __name__ == '__main__':
     parser.add_argument("file_mzn")
     parser.add_argument("file_instance", help="(can also be a directory to run everything matching 'day*.txt' in the directory)")
     parser.add_argument("file_forecast")
+    parser.add_argument("--mzn-solver", help="the mzn solver to use (mzn-g12mip or mzn-gecode for example)", default='mzn-g12mip')
     parser.add_argument("--mzn-dir", help="optionally, if the binaries are not on your PATH, set this to the directory of the MiniZinc IDE", default="")
     parser.add_argument("--tmp", help="temp directory (default = automatically generated)")
     # debugging options:
@@ -150,7 +151,7 @@ if __name__ == '__main__':
     if os.path.isfile(args.file_instance):
         # single file, run it
         mzn_runcheck(args.file_mzn, args.file_instance, args.file_forecast,
-                     tmpdir, mzn_dir=args.mzn_dir,
+                     tmpdir, mzn_dir=args.mzn_dir, mzn_solver=args.mzn_solver,
                      print_output=args.print_output, pretty_print=args.print_pretty,
                      verbose=args.v)
 

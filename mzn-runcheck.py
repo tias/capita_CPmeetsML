@@ -23,6 +23,29 @@ import checker_mzn as chkmzn
 def basename(fname):
     return os.path.splitext(os.path.basename(fname))[0]
 
+# source: http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+def which(program):
+    def is_exe(fpath):
+        return os.path.exists(fpath) and os.access(fpath, os.X_OK)
+
+    def ext_candidates(fpath):
+        yield fpath
+        for ext in os.environ.get("PATHEXT", "").split(os.pathsep):
+            yield fpath + ext
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            for candidate in ext_candidates(exe_file):
+                if is_exe(candidate):
+                    return candidate
+
+    return None
+
 def mzn_runcheck(file_mzn, file_instance, file_forecast, tmpdir, mzn_solver='mzn-g12mip', mzn_dir=None, print_output=False, pretty_print=False, print_header=True, verbose=0):
     # ./instance2dzn.py ../smallinstances/demo_00/instance.txt
     # TODO: maybe this should (have) use(d) Instance() from checker...
@@ -50,18 +73,15 @@ def mzn_runcheck(file_mzn, file_instance, file_forecast, tmpdir, mzn_solver='mzn
     env = os.environ.copy()
     if mzn_dir:
         env['PATH'] += os.pathsep + mzn_dir
-    try:
-        subprocess.check_output(["which", mzn_solver], env=env)
-    except:
-        print "Error: '%s' not on PATH (nor in --mzn-dir)"%mzn_solver
-        sys.exit(1)
-    try:
-        subprocess.check_output(["which", 'minizinc'], env=env)
-    except:
+    if not which('minizinc'):
         print "Error: '%s' not on PATH (nor in --mzn-dir)"%'minizinc'
         sys.exit(1)
+    mzn_solver_bin = which(mzn_solver)
+    if mzn_solver_bin == None:
+        print "Error: '%s' not on PATH (nor in --mzn-dir)"%mzn_solver
+        sys.exit(1)
     # mzn-g12mip energy_noupdown.mzn ../smallinstances/demo_00/instance.dzn forecast.dzn > minizinc.out
-    cmd = [mzn_solver, file_mzn, dzn_instance, dzn_forecast]
+    cmd = [mzn_solver_bin, file_mzn, dzn_instance, dzn_forecast]
     if verbose >= 1:
         print "Running:", " ".join(cmd)
     time_start = time.time()

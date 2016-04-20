@@ -46,89 +46,7 @@ def which(program):
 
     return None
 
-def mzn_runcheck(file_mzn, file_instance, file_forecast, tmpdir, mzn_solver='mzn-g12mip', mzn_dir=None, print_output=False, pretty_print=False, print_header=True, verbose=0):
-    # ./instance2dzn.py ../smallinstances/demo_00/instance.txt
-    # TODO: maybe this should (have) use(d) Instance() from checker...
-    data = i2dzn.read_instance(file_instance)
-    i2dzn.make_offset1(data)
-    dzn_data = i2dzn.get_dzn(data)
-    dzn_instance = join(tmpdir, "%s.dzn"%basename(file_instance))
-    with open(dzn_instance, 'w') as fout:
-        fout.write(dzn_data)
-    if verbose >= 2:
-        print "Written dzn_instance to",dzn_instance
-
-    # ./forecast2dzn.py -t 30 forecast.txt
-    timestep = data['time_step']
-    data_forecasts = []
-    if not isinstance(file_forecast, str):
-        # assume we were passed an array (small hack)
-        data_forecasts = file_forecast
-    else:
-        data_forecasts = f2dzn.read_forecast(file_forecast)
-    data_forecasts = f2dzn.rescale(timestep, data_forecasts)
-    dzn_data_forecasts = f2dzn.get_forecast_dzn(data_forecasts)
-    dzn_forecast = join(tmpdir, "%s.dzn"%basename(file_forecast))
-    with open(dzn_forecast, 'w') as fout:
-        fout.write(dzn_data_forecasts)
-    if verbose >= 2:
-        print "Written dzn_forecast to:", dzn_forecast
-
-    # every more checks in case people don't set their path...
-    env = os.environ.copy()
-    if mzn_dir:
-        env['PATH'] += os.pathsep + mzn_dir
-    if not which('minizinc'):
-        print "Error: '%s' not on PATH (nor in --mzn-dir)"%'minizinc'
-        sys.exit(1)
-    mzn_solver_bin = which(mzn_solver)
-    if mzn_solver_bin == None:
-        print "Error: '%s' not on PATH (nor in --mzn-dir)"%mzn_solver
-        sys.exit(1)
-    # mzn-g12mip energy_noupdown.mzn ../smallinstances/demo_00/instance.dzn forecast.dzn > minizinc.out
-    cmd = [mzn_solver_bin, file_mzn, dzn_instance, dzn_forecast]
-    if verbose >= 1:
-        print "Running:", " ".join(cmd)
-    time_start = time.time()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    out, err = p.communicate()
-    time_stop = time.time()
-    if print_output or verbose >= 1:
-        print "Output: \"\"\""
-        print out
-        print "\"\"\""
-    if err != None and err.strip() != "":
-        print "Error running '%s':"%(' '.join(cmd))
-        print err
-    else:
-        out = out.split('\n')
-        #print "done, ",[x for x in out if x.startswith('Cost=')]
-
-        # ./checker_mzn.py ../smallinstances/demo_01
-        instance = Instance()
-
-        # read standard instance and load forecast
-        instance.read_instance(file_instance)
-        instance.load_forecast(data_forecasts)
-        if data_actual:
-            instance.load_actual(data_actual)
-        # load minizinc solution from 'out'
-        chkmzn.read_mznsolution(instance, out)
-
-        if pretty_print or verbose >= 1:
-            chkmzn.pretty_print(instance)
-
-        instance.verify()
-        errstr = instance.geterrorstring()
-        if errstr:
-            print "%s; %s; Error; Error trying to verify the instance: '%s'"%(file_instance, file_forecast, errstr)
-            print >> sys.stderr, errstr
-        else:
-            # csv print:
-            timing = (time_stop - time_start)
-            chkmzn.print_instance_csv(file_instance, file_forecast, instance, timing=timing, header=print_header)
-
-def mzn_run(file_mzn, file_instance, data_forecasts, tmpdir, mzn_solver='mzn-g12mip', mzn_dir=None, print_output=False, verbose=0):
+def mzn_run(file_mzn, file_instance, data_forecasts, tmpdir, mzn_solver='mzn-g12mip', mzn_dir=None, print_output=False, verbose=0, check_win_hack=True):
     # ./instance2dzn.py ../smallinstances/demo_00/instance.txt
     # TODO: maybe this should (have) use(d) Instance() from checker...
     data = i2dzn.read_instance(file_instance)
@@ -153,16 +71,17 @@ def mzn_run(file_mzn, file_instance, data_forecasts, tmpdir, mzn_solver='mzn-g12
     env = os.environ.copy()
     if mzn_dir:
         env['PATH'] += os.pathsep + mzn_dir
-    try:
-        subprocess.check_output(["which", mzn_solver], env=env)
-    except:
-        print "Error: '%s' not on PATH (nor in --mzn-dir)"%mzn_solver
-        sys.exit(1)
-    try:
-        subprocess.check_output(["which", 'minizinc'], env=env)
-    except:
+    if not which('minizinc'):
         print "Error: '%s' not on PATH (nor in --mzn-dir)"%'minizinc'
         sys.exit(1)
+    mzn_solver_bin = which(mzn_solver)
+    if mzn_solver_bin == None:
+        print "Error: '%s' not on PATH (nor in --mzn-dir)"%mzn_solver
+        sys.exit(1)
+    # Special hack for some windows users:
+    if check_win_hack and os.name == "nt":
+        if not mzn_solver_bin.endswith('.bat'):
+            mzn_solver_bin += '.bat'
 
     # mzn-g12mip energy_noupdown.mzn ../smallinstances/demo_00/instance.dzn forecast.dzn > minizinc.out
     cmd = [mzn_solver, file_mzn, dzn_instance, dzn_forecast]
@@ -253,6 +172,7 @@ if __name__ == '__main__':
     for (i,f) in enumerate(f_instances):
         (timing, out) = mzn_run(args.file_mzn, f, data_forecasts,
                                 tmpdir, mzn_dir=args.mzn_dir,
+                                mzn_solver=args.mzn_solver,
                                 print_output=args.print_output,
                                 verbose=args.v)
         instance = mzn_toInstance(f, out, data_forecasts,

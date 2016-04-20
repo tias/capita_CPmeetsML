@@ -1,6 +1,6 @@
-\documentclass[a4,12pt]{article}
+\documentclass[a4,10pt]{article}
 
-\usepackage{a4wide}
+\usepackage[a4paper,includeheadfoot,margin=2.54cm]{geometry} % was \usepackage{a4wide}
 \usepackage{url}
 
 %opening
@@ -159,5 +159,16 @@ You will be evaluated on 3 criteria, each quoted on 6 points:
 \item \textbf{Quality of the scientific report} Is the writing style appropriate? Are the descriptions and arguments clear? Is there enough yet not too much detail? Are the results fairly presented?
 \end{itemize}
 You can additionally win or loose a point based on the creativity and novelty of your solution: if it is potentially publishable you get +2, if it makes no effort to go beyond the prototype or what is in the Ifrim et al. paper you get +0, otherwise you get +1.
+
+\subsection*{Report format}
+The report should be in 10pt font, a4 papersize, with standard 'wide' margins.
+
+In latex, this is obtained with (see this document):
+\begin{verbatim}
+\documentclass[a4,10pt]{article}
+
+\usepackage[a4paper,includeheadfoot,margin=2.54cm]{geometry} % was \usepackage{a4wide}
+\end{verbatim}
+
 
 \end{document}

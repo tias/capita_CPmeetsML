@@ -100,10 +100,20 @@ class Instance(object):
             self.day.read_actual(f, nrperiods)
         self.actualsread = True
 
+    def load_actual(self, arr):
+        nrperiods = len(arr)
+        errlog(MINUTESINDAY / self.q == nrperiods,
+                   "Actuals contain a different number of "
+                   "time periods, expected %d, got %d." %
+                   (MINUTESINDAY / self.q, nrperiods))
+
+        self.day.actuals = arr
+        self.actualsread = True
+
     def load_forecast(self, arr):
         nrperiods = len(arr)
         errlog(MINUTESINDAY / self.q == nrperiods,
-                   "Forecast file contains a different number of "
+                   "Forecasts contain a different number of "
                    "time periods, expected %d, got %d." %
                    (MINUTESINDAY / self.q, nrperiods))
 

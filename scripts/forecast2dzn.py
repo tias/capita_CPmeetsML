@@ -31,16 +31,16 @@ def get_forecast_dzn(data):
 
 
 def rescale(time_step, data):
-    data_step = (24*60)/len(data) 
-    if data_step > time_step:
-        print "Forecast: time_step smaller, repeating data"
-        print "Forecast: TODO"
-        return data
-    if data_step < time_step:
-        factor = time_step / data_step
+    time_periods = (24*60)/time_step
+    if len(data) < time_periods:
+        print "Error, fewer forecasted data then time periods."
+        print "Probably missing data, choose another day..."
+        sys.exit(1)
+    if len(data) > time_periods:
+        factor = len(data) / time_periods
         #print "Forecast: time_step bigger than data, aggregating with factor %i"%factor
         newdata = []
-        for t in xrange( (24*60)/time_step ):
+        for t in xrange( time_periods ):
             offset = t*factor
             newdata.append( sum(data[offset:offset+factor]) )
         return newdata

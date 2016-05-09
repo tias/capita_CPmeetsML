@@ -59,7 +59,6 @@ Note that like all real data, this is \textbf{dirty} data. For example:
 \begin{itemize}
 \item The feature names in the PDF do not literally match the ones of the datafile ('ForecastWindProduction' = 'WindForecast', 'SystemLoadEA' = 'LoadForecast', 'SMPEA' = 'PriceForecast', 'SystemLoadEP2' = 'ActualLoad', 'SMPEP2' = 'ActualPrice', ...)
 \item There is \textbf{missing} data. This is indicated by a 'NaN' entry in the data. Especially the features 'ORKTemperature' and 'ORKWindspeed' contain many missing values. If you wish to use those features, you should deal with them properly, e.g. by imputing values.
-\item There are also missing timeslots and maybe even missing dates, especially early on in the dataset (year 2011). This definitely messes with the solving if part of the 14 consecutive days, but may also have unexpected effects on your learning method. It is acceptable to avoid periods with missing date/timeslots in your evaluation; you are also free to come up with more elegant solutions.
 \item Negative energy prices are not noise, prices can actually be negative on the real market (e.g. when network almost overloaded by renewable+nuclear energy)
 \item ... there may be other dirty/noisy things
 \end{itemize}
@@ -68,7 +67,7 @@ Furthermore, we assume we are operating in a 'day-ahead' scheme (the official ch
 
 
 \paragraph{3. Learning and forecasting of the energy price}
-You can implement any aspect of this task in any programming language that you want. However, to help you get started quickly I have created a few \textbf{example python scripts}. The file \texttt{prices\_data.py} contains routines for easily reading and querying the energy price data. The file \texttt{prices\_regress.py} contains some sample code that uses this data and the \textit{scikitlearn} machine learning toolbox, to learn a linear regression and SVM regression model on 30 historic days to predict for the week ahead. I also added some code that visualizes the real and predicted prices, to encourage you to visualize your data during development too.
+You can implement any aspect of this task in any programming language that you want. However, to help you get started quickly I have created a few \textbf{example python scripts}. The file \texttt{prices\_data.py} contains routines for easily reading and querying the energy price data. The file \texttt{prices\_regress.py} contains some sample code that uses this data and the \textit{scikitlearn} machine learning toolbox~\footnote{SKLearn has a number of dependencies. For windows users, Lieven Paulissen reported succesfully installing the python wheels using the pip command, especially numpy and matplotlib, from here: \url{http://www.lfd.uci.edu/~gohlke/pythonlibs}}, to learn a linear regression and SVM regression model on 30 historic days to predict for the week ahead. I also added some code that visualizes the real and predicted prices, to encourage you to visualize your data during development too.
 
 Run \texttt{prices\_regress.py} (from the \texttt{scripts/} directory) to see what it does, and check the source for details...
 

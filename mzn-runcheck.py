@@ -84,7 +84,7 @@ def mzn_run(file_mzn, file_instance, data_forecasts, tmpdir, mzn_solver='mzn-g12
             mzn_solver_bin += '.bat'
 
     # mzn-g12mip energy_noupdown.mzn ../smallinstances/demo_00/instance.dzn forecast.dzn > minizinc.out
-    cmd = [mzn_solver, file_mzn, dzn_instance, dzn_forecast]
+    cmd = [mzn_solver_bin, file_mzn, dzn_instance, dzn_forecast]
     if verbose >= 1:
         print "Running:", " ".join(cmd)
 

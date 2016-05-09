@@ -23,6 +23,7 @@ import checker_mzn as chkmzn
 from prices_data import *
 from prices_regress import *
 import numpy as np
+# if you don't have sklearn installed, here is a tip from Lieven Paulissen for windows users: "I installed the python wheels using the pip command, especially numpy and matplotlib, from here: http://www.lfd.uci.edu/~gohlke/pythonlibs."
 from sklearn import linear_model
 
 # from http://code.activestate.com/recipes/577932-flatten-arraytuple/

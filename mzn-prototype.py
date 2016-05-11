@@ -89,7 +89,7 @@ def run(f_instances, day, dat, args=None):
         data_forecasts = preds[i]
         data_actual = actuals[i]
         (timing, out) = runcheck.mzn_run(args.file_mzn, f, data_forecasts,
-                                tmpdir, mzn_dir=args.mzn_dir,
+                                tmpdir, mzn_dir=args.mzn_dir, mzn_solver=args.mzn_solver,
                                 print_output=args.print_output,
                                 verbose=args.v-1)
         instance = runcheck.mzn_toInstance(f, out, data_forecasts,

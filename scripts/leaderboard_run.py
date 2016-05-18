@@ -66,7 +66,10 @@ if __name__ == '__main__':
         res[load] = dict()
         globpatt = os.path.join(dir_load, load, 'day*.txt')
         f_instances = sorted(glob.glob(globpatt))
-
+        
+        sum = 0
+        sum_runtime = 0
+        
         for day_str in startdays:
             res[load][day_str] = dict()
             day = datetime.strptime(day_str, '%Y-%m-%d').date()
@@ -90,6 +93,11 @@ if __name__ == '__main__':
                 instance.compute_costs()
                 tot_act += instance.day.cj_act
             print "%s from %s, linear: total actual cost: %.1f (runtime: %.2f)"%(load, day_str, tot_act, runtime)
+            
+            sum += tot_act
+            sum_runtime += runtime
+        
+        print "%s Sum of costs: %.1f (runtime: %.2f)"%(load, sum, sum_runtime)
 
     with open(args.out, 'w') as f_out:
         json.dump(res, f_out)
